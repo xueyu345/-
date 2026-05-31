@@ -1,0 +1,8 @@
+{
+  "name": "DailyPulse",
+  "description": "一个多功能的每日计划打卡应用，支持多种打卡模式（开关、计数、时长、数值）和详尽的数据统计。",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

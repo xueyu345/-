@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Habit Validation
+    function isValidHabit(data) {
+      return data.userId == request.auth.uid 
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.type in ['binary', 'counter', 'duration', 'numeric']
+        && data.createdAt == request.time;
+    }
+
+    match /habits/{habitId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidHabit(request.resource.data);
+      allow update: if isSignedIn() && isOwner(resource.data.userId) 
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+    }
+
+    // Log Validation
+    function isValidLog(data) {
+      return data.userId == request.auth.uid
+        && data.habitId is string
+        && data.date is string && data.date.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && data.updatedAt == request.time;
+    }
+
+    match /logs/{logId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow write: if isSignedIn() && isValidLog(request.resource.data);
+    }
+  }
+}

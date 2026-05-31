@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "Habit": {
+      "title": "Habit",
+      "description": "Definition of a habit to track",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["binary", "counter", "duration", "numeric"] },
+        "goal": { "type": "number" },
+        "unit": { "type": "string" },
+        "color": { "type": "string" },
+        "icon": { "type": "string" },
+        "frequency": { "type": "string", "enum": ["daily", "weekly"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "type", "createdAt"]
+    },
+    "Log": {
+      "title": "Log",
+      "description": "A daily entry for a habit",
+      "type": "object",
+      "properties": {
+        "habitId": { "type": "string" },
+        "userId": { "type": "string" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "value": { "type": "number" },
+        "completed": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["habitId", "userId", "date", "value", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "habits/{habitId}": {
+      "schema": "Habit",
+      "description": "Habit definitions"
+    },
+    "logs/{logId}": {
+      "schema": "Log",
+      "description": "Daily habit logs"
+    }
+  }
+}
